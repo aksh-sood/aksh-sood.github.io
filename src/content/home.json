@@ -10,10 +10,12 @@
       "Kubernetes & AWS"
     ],
     "blurb": "Hi, my name is Aksh Sood and I have spent the last three years running AWS and Kubernetes platforms for financial-infrastructure customers — usually from inside their environment rather than behind a ticket queue. Lately I have been building agent systems the same way.",
-    "cta": { "label": "Hire Me Now", "href": "#contact" },
-    "portrait": null
+    "cta": {
+      "label": "Hire Me Now",
+      "href": "#contact"
+    },
+    "portrait": "/src/assets/aksh.png"
   },
-
   "stats": [
     {
       "value": "3",
@@ -27,17 +29,16 @@
       "confirm": "Projects-completed count. The reference template shows \"138+ Projects completed on 30 countries\". No figure for this exists in either resume — supply a real number and scope, or delete this stat."
     }
   ],
-
   "clients": {
     "value": null,
     "label": "Clients",
     "confirm": "Client count and the four avatar images. The reference template shows \"20K+ Clients\". Aksh is employed, not freelancing, so there is no client roster to count — supply a figure and avatars, or delete this block."
   },
-
   "statsBody": "I joined Baton as an intern in 2023 and have spent the years since on financial infrastructure — the systems banks settle trades on, where a bad deploy is somebody's money. What I like most is the part that isn't infrastructure: being on the call when the requirement is still vague, and staying on it until the thing runs.",
-
-  "statsCta": { "label": "Learn More", "href": "#about" },
-
+  "statsCta": {
+    "label": "Learn More",
+    "href": "#about"
+  },
   "media": [
     {
       "id": "reel",
@@ -52,9 +53,7 @@
       "add": "A second photograph for the right-hand card."
     }
   ],
-
   "opening": "For three years I’ve run AWS and Kubernetes platforms for financial-infrastructure customers, usually from inside their environment rather than behind a ticket queue. Lately I’ve been building agent systems the same way — LangChain on Bedrock AgentCore, retrieval pipelines, agents that hold a conversation and then go do something.",
-
   "figures": [
     {
       "value": "$180K",
@@ -74,7 +73,6 @@
       "caption": "recovery objective for multi-region failover, validated in practice"
     }
   ],
-
   "about": [
     "I grew up wanting to know how things were wired, and ended up in the part of software where that’s the whole job. I joined Baton as an intern in 2023 and have spent the years since on financial infrastructure — the systems banks settle trades on, where a bad deploy is somebody’s money.",
     "What I like most is the part that isn’t infrastructure: being on the call when the requirement is still vague, and staying on it until the thing runs.",

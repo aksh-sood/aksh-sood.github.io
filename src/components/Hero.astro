@@ -1,10 +1,23 @@
 ---
+import { Image } from 'astro:assets';
 import { home, site } from '../data';
 import Icon from './Icon.astro';
 import Sparkle from './Sparkle.astro';
 import Slot from './Slot.astro';
 
 const { hero } = home;
+
+/*
+  The portrait path lives in home.json, so it cannot be a static import. glob
+  gives Astro the full set at build time and still runs the chosen one through
+  the image pipeline — AVIF/WebP, responsive widths, a hashed filename. A raw
+  <img> pointing at public/ would ship the original bytes untouched.
+*/
+const portraits = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/*.{png,jpg,jpeg,webp,avif}',
+);
+const loader = hero.portrait ? portraits[hero.portrait] : undefined;
+const portrait = loader ? (await loader()).default : undefined;
 
 const socials = [
   { name: 'github' as const, href: site.github, label: 'GitHub' },
@@ -66,13 +79,17 @@ const socials = [
         <Sparkle size="1.1rem" top="0.8rem" right="0.8rem" z={1} />
 
         {
-          hero.portrait ? (
-            <img
+          portrait ? (
+            <Image
               class="panel__img"
-              src={hero.portrait}
-              alt={`${site.name}, ${site.role}`}
-              width="520"
-              height="620"
+              src={portrait}
+              alt={`${site.name}, ${site.role} at ${site.company}`}
+              widths={[420, 640, 840, 1240]}
+              {/* The slab is capped at 26rem and otherwise fills the container,
+                  which is the viewport less its gutters — never a full 100vw. */}
+              sizes="min(26rem, calc(100vw - 2.5rem))"
+              loading="eager"
+              fetchpriority="high"
             />
           ) : (
             <Slot kind="ADD" tone="panel">
@@ -275,10 +292,13 @@ const socials = [
 
 
   .panel__img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: var(--radius-md);
+    /* Follows the slab, including its squared-off top-right corner. */
+    border-radius: inherit;
   }
 
 
