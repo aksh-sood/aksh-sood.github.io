@@ -18,7 +18,17 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   integrations: [mdx(), sitemap()],
-  build: { inlineStylesheets: 'auto' },
+  /*
+    `format: 'file'` emits work/slug.html rather than work/slug/index.html.
+
+    GitHub Pages serves a directory only at its trailing-slash URL, so with the
+    default directory format every canonical and every sitemap entry — all
+    written without a trailing slash by `trailingSlash: 'never'` — took a 301
+    before resolving, and no canonical matched the URL actually served. Flat
+    files are served directly at the extensionless path, so the redirect goes
+    away and the two agree.
+  */
+  build: { inlineStylesheets: 'auto', format: 'file' },
   fonts: [
     {
       provider: fontProviders.local(),
