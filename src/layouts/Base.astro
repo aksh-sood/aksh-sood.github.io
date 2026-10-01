@@ -21,7 +21,21 @@ const {
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — platform engineer`;
-const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+/*
+  The clean, extensionless URL for this page.
+
+  `build.format: 'file'` emits notes.html, so Astro.url.pathname carries a
+  .html suffix at build time. GitHub Pages serves both /notes and /notes.html,
+  but only one of them should be the canonical, and it has to be the one the
+  sitemap and every internal link already use.
+*/
+const canonical = new URL(
+  Astro.url.pathname
+    .replace(/index\.html$/, '')
+    .replace(/\.html$/, '')
+    .replace(/\/$/, '') || '/',
+  Astro.site,
+);
 const ogUrl = new URL(ogImage, Astro.site);
 ---
 
