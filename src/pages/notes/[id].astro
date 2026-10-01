@@ -1,0 +1,77 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import '../../styles/prose.css';
+
+export const getStaticPaths = (async () => {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  return notes.map((note) => ({ params: { id: note.id }, props: { note } }));
+}) satisfies GetStaticPaths;
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+---
+
+<Base
+  title={note.data.title}
+  description={note.data.description}
+  ogImage={`/og/notes/${note.id}.png`}
+>
+  <Header />
+
+  <main id="main">
+    <article class="note-page">
+      <div class="container">
+        <header class="note-page__head">
+          <p class="note-page__back"><a href="/notes">Back to writing</a></p>
+          <h1 class="note-page__title">{note.data.title}</h1>
+          <time class="note-page__date" datetime={note.data.date.toISOString()}>
+            {
+              note.data.date.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })
+            }
+          </time>
+        </header>
+
+        <div class="prose">
+          <Content />
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .note-page {
+    padding-block: var(--space-2xl) var(--section-gap);
+  }
+
+  .note-page__head {
+    padding-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    border-bottom: var(--hairline) solid var(--rule);
+  }
+
+  .note-page__back,
+  .note-page__date {
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    color: var(--ink-muted);
+  }
+
+  .note-page__title {
+    max-width: 24ch;
+    margin-block: var(--space-lg);
+    font-size: var(--step-h1);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+</style>

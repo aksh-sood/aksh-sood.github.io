@@ -1,0 +1,22 @@
+---
+import Section from './Section.astro';
+import { home } from '../data';
+---
+
+<Section id="about" label="About" eyebrow="Background">
+  <div class="about">
+    {home.about.map((paragraph) => <p>{paragraph}</p>)}
+  </div>
+</Section>
+
+<style>
+  /* The section body is full-width now, so the measure has to be set here —
+     unconstrained this copy runs past 120 characters a line at 1600px. */
+  .about {
+    max-width: 62ch;
+  }
+
+  .about p + p {
+    margin-top: var(--space-md);
+  }
+</style>

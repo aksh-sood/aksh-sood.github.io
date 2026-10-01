@@ -1,0 +1,100 @@
+---
+import Section from './Section.astro';
+import { toolbox, site } from '../data';
+---
+
+<Section id="toolbox" label="Toolbox" eyebrow="Stack">
+  <div class="groups">
+    {
+      toolbox.groups.map((group) => (
+        <div class="group">
+          <h3 class="group__label">{group.label}</h3>
+          <ul class="group__items">
+            {group.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+
+    <div class="group">
+      <h3 class="group__label">Certifications</h3>
+      <ul class="group__items">
+        {site.certifications.map((cert) => (
+          <li>
+            {/* A certification nobody can check is just a word. Link the ones
+                that have a public credential page; leave the rest as text. */}
+            {cert.url ? (
+              <a href={cert.url} rel="noopener">
+                {cert.name}
+              </a>
+            ) : (
+              cert.name
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <p class="education">
+    {site.education.degree}, {site.education.school}. {site.education.period},
+    {' '}{site.education.note}.
+  </p>
+</Section>
+
+<style>
+  /* Column flow rather than a grid: the groups are very different lengths, and
+     a row-aligned grid leaves a dead gap under every short one. */
+  .groups {
+    columns: 1;
+    column-gap: var(--space-2xl);
+  }
+
+  .group {
+    break-inside: avoid;
+    padding-bottom: var(--space-xl);
+  }
+
+  @media (min-width: 34rem) {
+    .groups {
+      columns: 2;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .groups {
+      columns: 3;
+    }
+  }
+
+  .group__label {
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--hairline) solid var(--rule);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    letter-spacing: var(--tracking-mono);
+  }
+
+  /* Plain text lists, set in prose rather than as tags or logos. */
+  .group__items {
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--step-mono-sm);
+    font-family: var(--face-mono);
+    line-height: 1.85;
+    color: var(--ink-muted);
+  }
+
+  .education {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-md);
+    border-top: var(--hairline) solid var(--rule);
+    max-width: 54ch;
+    font-size: var(--step-mono-sm);
+    font-family: var(--face-mono);
+    color: var(--ink-muted);
+  }
+</style>

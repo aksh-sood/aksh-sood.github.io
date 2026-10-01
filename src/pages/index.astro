@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Stats from '../components/Stats.astro';
+import MediaRow from '../components/MediaRow.astro';
+import Figures from '../components/Figures.astro';
+import Services from '../components/Services.astro';
+import Pricing from '../components/Pricing.astro';
+import Work from '../components/Work.astro';
+import Projects from '../components/Projects.astro';
+import Experience from '../components/Experience.astro';
+import Toolbox from '../components/Toolbox.astro';
+import Writing from '../components/Writing.astro';
+import About from '../components/About.astro';
+import Footer from '../components/Footer.astro';
+import { site, toolbox } from '../data';
+import { SITE_URL } from '../consts';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: SITE_URL,
+  email: `mailto:${site.email}`,
+  jobTitle: site.role,
+  worksFor: { '@type': 'Organization', name: site.company },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: site.education.school },
+  address: { '@type': 'PostalAddress', addressCountry: 'IN' },
+  knowsAbout: toolbox.groups.flatMap((group) => group.items),
+  sameAs: [site.github, site.linkedin],
+};
+---
+
+<Base jsonLd={jsonLd}>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Stats />
+    <MediaRow />
+    <Figures />
+    <Services />
+    <Work />
+    <Projects />
+    <Experience />
+    <Toolbox />
+    <Writing />
+    <Pricing />
+    <About />
+  </main>
+  <Footer />
+</Base>

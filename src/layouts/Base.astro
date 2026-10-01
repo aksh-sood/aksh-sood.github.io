@@ -1,0 +1,89 @@
+---
+import { Font } from 'astro:assets';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Overrides the generated OG image for this page. */
+  ogImage?: string;
+  /** Emitted verbatim into a JSON-LD script tag. */
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  ogImage = '/og/default.png',
+  jsonLd,
+} = Astro.props;
+
+const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — platform engineer`;
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const ogUrl = new URL(ogImage, Astro.site);
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/*
+      GitHub Pages cannot send HTTP response headers, so the policy that
+      vercel.json and public/_headers carry on other hosts is declared here
+      instead. It has to sit before anything it governs.
+
+      `frame-ancestors` is deliberately absent: it is ignored in meta form and
+      only works as a real header. Clickjacking protection is therefore not
+      available on this host — it comes back for free on Vercel or Cloudflare.
+    */}
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'"
+    />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogUrl.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
+    <meta name="theme-color" content="#141414" />
+
+    {/*
+      Preload only what the first screen needs: the body face, and the two
+      display weights the nav and hero are set in. Poppins 400/500 and the mono
+      load on demand. Metric-matched fallbacks mean the swap costs no layout
+      shift.
+    */}
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-display" preload={[{ weight: 600 }, { weight: 700 }]} />
+    <Font cssVariable="--font-mono" />
+
+    {
+      jsonLd && (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(jsonLd)}
+        />
+      )
+    }
+
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,200 @@
+---
+import '../../styles/diagram.css';
+---
+
+{/*
+  The site's one interactive moment. This case study's claim is that a failover
+  is a change in where a single endpoint points, not a change in every client
+  application — so the reader gets to perform it and watch exactly one thing move.
+
+  A checkbox plus sibling selectors: no JavaScript, no hydration, and the control
+  is keyboard-operable and announced as a toggle for free. The reduced-motion
+  rule in base.css already strips the transitions.
+*/}
+<figure class="diagram dr">
+  <input type="checkbox" id="dr-failover" class="dr__input visually-hidden" />
+
+  <div class="dr__bar">
+    <label for="dr-failover" class="dr__toggle">Simulate failover</label>
+  </div>
+
+  <svg class="dr__svg" viewBox="0 0 720 372" role="img" aria-labelledby="dr-title dr-desc">
+    <title id="dr-title">Network-of-brokers topology across three AWS regions</title>
+    <desc id="dr-desc">
+      Producers and consumers connect through a single endpoint. Brokers in Oregon, London
+      and Ireland are joined as a network, so messages forward across the links. Normally
+      the endpoint points at Oregon, which is active, while London and Ireland are passive.
+      Turning on the failover toggle repoints the endpoint at London and makes it active,
+      and Oregon becomes unreachable. Nothing else in the picture changes, which is the point.
+    </desc>
+
+    <!-- Endpoint. Producers and consumers are named inside it rather than as
+         floating labels, which keeps the left edge clear. -->
+    <path class="diagram__fill" d="M22 22 L251 23 L252 89 L23 88 Z"></path>
+    <path class="diagram__art" d="M22 22 L251 23 L252 89 L23 88 Z"></path>
+    <text class="diagram__label" x="40" y="51">single endpoint</text>
+    <text class="diagram__meta" x="40" y="71">producers and consumers</text>
+
+    <!-- Endpoint to Oregon: the live path by default -->
+    <path class="diagram__art dr-link dr-link--oregon" d="M96 89 C 97 120, 95 148, 96 190"></path>
+    <path class="diagram__ink-fill dr-arrow dr-arrow--oregon" d="M96 198 L91 186 L101 186 Z"></path>
+    <text class="diagram__meta dr-only-normal" x="106" y="142">points here</text>
+
+    <!-- Endpoint to London: dashed and waiting by default, live once failed over -->
+    <path
+      class="diagram__accent dr-link dr-link--london"
+      d="M252 58 C 330 60, 352 112, 356 189"></path>
+    <path class="diagram__accent-fill dr-arrow dr-arrow--london" d="M356 198 L351 186 L361 186 Z"
+    ></path>
+    <text class="diagram__meta dr-accent-text dr-only-normal" x="268" y="126">on failover</text>
+    <text class="diagram__meta dr-accent-text dr-only-failed" x="268" y="126">points here</text>
+
+    <!-- Region brokers -->
+    <path class="diagram__fill dr-fill dr-fill--oregon" d="M22 190 L171 191 L172 259 L23 258 Z"
+    ></path>
+    <path class="diagram__art" d="M22 190 L171 191 L172 259 L23 258 Z"></path>
+    <text class="diagram__label" x="40" y="219">Oregon</text>
+    <text class="diagram__meta dr-only-normal" x="40" y="239">active</text>
+    <text class="diagram__meta dr-only-failed" x="40" y="239">unreachable</text>
+
+    <path class="diagram__fill dr-fill dr-fill--london" d="M282 191 L431 190 L430 259 L281 258 Z"
+    ></path>
+    <path class="diagram__art" d="M282 191 L431 190 L430 259 L281 258 Z"></path>
+    <text class="diagram__label" x="300" y="219">London</text>
+    <text class="diagram__meta dr-only-normal" x="300" y="239">passive</text>
+    <text class="diagram__meta dr-only-failed" x="300" y="239">active</text>
+
+    <!-- Ireland is identical in both states, which is itself the information -->
+    <path class="diagram__art" d="M542 190 L691 191 L690 259 L541 258 Z"></path>
+    <text class="diagram__label" x="560" y="219">Ireland</text>
+    <text class="diagram__meta" x="560" y="239">passive</text>
+
+    <!-- Network of brokers: the links that carry messages between regions -->
+    <path class="diagram__art" d="M172 224 C 212 223, 244 225, 281 224"></path>
+    <path class="diagram__art" d="M431 224 C 471 225, 503 223, 541 224"></path>
+    <path class="diagram__art" d="M97 259 C 100 316, 190 334, 356 335 C 522 336, 612 317, 616 259"></path>
+    <text class="diagram__meta" x="286" y="356">network of brokers</text>
+  </svg>
+
+  <p class="dr__status" aria-live="polite">
+    <span class="dr-only-normal">
+      Oregon is serving traffic. London and Ireland are attached to the network and idle.
+    </span>
+    <span class="dr-only-failed">
+      Oregon is gone and London is serving traffic. One endpoint moved — no client
+      application changed, and nothing had to be replayed by hand.
+    </span>
+  </p>
+
+  <figcaption class="diagram__caption">
+    The managed replication feature didn’t cover this region combination, so the brokers are
+    joined as a network instead. Clients hold one endpoint, which is what makes failover a
+    single deliberate change rather than a change in every application.
+  </figcaption>
+</figure>
+
+<style>
+  .dr__bar {
+    margin-bottom: var(--space-md);
+  }
+
+  .dr__toggle {
+    display: inline-block;
+    padding: var(--space-2xs) var(--space-sm);
+    border: var(--hairline) solid var(--rule-strong);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--ink-muted);
+    cursor: pointer;
+    user-select: none;
+    transition:
+      color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease);
+  }
+
+  .dr__toggle:hover {
+    color: var(--ink);
+    border-color: var(--ink-muted);
+  }
+
+  /* The checkbox is visually hidden but still focusable, so the ring has to be
+     drawn on the label it controls. */
+  .dr__input:focus-visible ~ .dr__bar .dr__toggle {
+    outline: var(--focus-ring) solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .dr__input:checked ~ .dr__bar .dr__toggle {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .dr__status {
+    max-width: var(--grid-measure);
+    margin-top: var(--space-md);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-xs);
+    line-height: 1.55;
+    color: var(--ink-muted);
+    text-wrap: pretty;
+  }
+
+  /* Both states are authored into the SVG and swapped, because CSS cannot
+     rewrite the content of an SVG text node. */
+  .dr-only-failed {
+    display: none;
+  }
+
+  .dr__input:checked ~ .dr__svg .dr-only-normal,
+  .dr__input:checked ~ .dr__status .dr-only-normal {
+    display: none;
+  }
+
+  .dr__input:checked ~ .dr__svg .dr-only-failed,
+  .dr__input:checked ~ .dr__status .dr-only-failed {
+    display: inline;
+  }
+
+  .dr-accent-text {
+    fill: var(--accent);
+  }
+
+  .dr-fill,
+  .dr-link,
+  .dr-arrow {
+    transition:
+      opacity var(--duration) var(--ease),
+      stroke var(--duration) var(--ease);
+  }
+
+  /* Default: Oregon is live, London is the waiting path. */
+  .dr-fill--london,
+  .dr-arrow--london {
+    opacity: 0;
+  }
+
+  .dr-link--london {
+    stroke-dasharray: 5 6;
+  }
+
+  /* Failed over: the endpoint moves, and only the endpoint moves. */
+  .dr__input:checked ~ .dr__svg .dr-fill--oregon,
+  .dr__input:checked ~ .dr__svg .dr-arrow--oregon {
+    opacity: 0;
+  }
+
+  .dr__input:checked ~ .dr__svg .dr-link--oregon {
+    stroke: var(--rule-strong);
+    stroke-dasharray: 3 5;
+  }
+
+  .dr__input:checked ~ .dr__svg .dr-fill--london,
+  .dr__input:checked ~ .dr__svg .dr-arrow--london {
+    opacity: 1;
+  }
+
+  .dr__input:checked ~ .dr__svg .dr-link--london {
+    stroke-dasharray: none;
+  }
+</style>

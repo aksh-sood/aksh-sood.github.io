@@ -1,0 +1,60 @@
+---
+import '../../styles/diagram.css';
+---
+
+<figure class="diagram">
+  <svg viewBox="0 0 720 300" role="img" aria-labelledby="scale-title scale-desc">
+    <title id="scale-title">Provisioned compute against used compute, before and after</title>
+    <desc id="scale-desc">
+      Two panels sharing the same demand curve. Before, provisioned capacity is a flat line
+      far above demand, and everything between the two is paid for and unused. After,
+      provisioned capacity steps up and down close behind demand, leaving a deliberate
+      margin instead of a constant one.
+    </desc>
+
+    <!-- Panel: before -->
+    <text class="diagram__label" x="20" y="28">before</text>
+    <path class="diagram__art" d="M20 250 L332 250"></path>
+    <path class="diagram__art" d="M20 250 L20 44"></path>
+
+    <path class="diagram__art" d="M30 70 C 130 69, 230 71, 326 70"></path>
+    <text class="diagram__meta" x="30" y="62">provisioned</text>
+
+    <path
+      class="diagram__art"
+      d="M30 215 L60 205 L90 220 L120 180 L150 195 L180 150 L210 170 L240 140 L270 175 L300 200 L326 190"
+    ></path>
+    <text class="diagram__meta" x="228" y="212">used</text>
+
+    <!-- The gap is the cost -->
+    <path class="diagram__accent" stroke-dasharray="4 5" d="M180 78 L180 143"></path>
+    <path class="diagram__accent-fill" d="M180 72 L175 84 L185 84 Z"></path>
+    <path class="diagram__accent-fill" d="M180 149 L175 137 L185 137 Z"></path>
+    <text class="diagram__meta" x="192" y="118" style="fill: var(--accent)">paid for,</text>
+    <text class="diagram__meta" x="192" y="132" style="fill: var(--accent)">not used</text>
+
+    <!-- Panel: after -->
+    <text class="diagram__label" x="390" y="28">after</text>
+    <path class="diagram__art" d="M390 250 L702 250"></path>
+    <path class="diagram__art" d="M390 250 L390 44"></path>
+
+    <path
+      class="diagram__art"
+      d="M400 215 L430 205 L460 220 L490 180 L520 195 L550 150 L580 170 L610 140 L640 175 L670 200 L696 190"
+    ></path>
+    <text class="diagram__meta" x="598" y="212">used</text>
+
+    <path
+      class="diagram__art"
+      d="M400 195 H460 V170 H520 V140 H580 V130 H640 V165 H670 V180 H696"
+    ></path>
+    <text class="diagram__meta" x="556" y="118">provisioned</text>
+  </svg>
+
+  <figcaption class="diagram__caption">
+    Cluster Autoscaler works from node groups you size in advance, so you pay for the
+    rounding error on every guess. Karpenter provisions against the pods that actually
+    exist, and consolidates back down — the margin above demand becomes a chosen number
+    rather than an accident.
+  </figcaption>
+</figure>

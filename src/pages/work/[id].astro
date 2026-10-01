@@ -1,0 +1,166 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import '../../styles/prose.css';
+
+export const getStaticPaths = (async () => {
+  const entries = (await getCollection('work', ({ data }) => !data.draft)).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+
+  return entries.map((entry, index) => ({
+    params: { id: entry.id },
+    props: {
+      entry,
+      prev: entries[index - 1] ?? null,
+      next: entries[index + 1] ?? null,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Base
+  title={entry.data.title}
+  description={entry.data.summary}
+  ogImage={`/og/work/${entry.id}.png`}
+>
+  <Header />
+
+  <main id="main">
+    <article class="case">
+      <div class="container">
+        <header class="case__head">
+          <p class="case__back"><a href="/#work">Back to selected work</a></p>
+          <h1 class="case__title">{entry.data.title}</h1>
+          <p class="case__standfirst">{entry.data.standfirst}</p>
+
+          <p class="case__meta">
+            <span class="case__period">{entry.data.period}</span>
+            {entry.data.stack.map((item) => <span>{item}</span>)}
+          </p>
+        </header>
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        {
+          (prev || next) && (
+            <nav class="case__nav" aria-label="Other case studies">
+              {prev ? (
+                <a href={`/work/${prev.id}`}>
+                  <span class="case__navlabel">Previous</span>
+                  {prev.data.title}
+                </a>
+              ) : (
+                <span />
+              )}
+              {next && (
+                <a href={`/work/${next.id}`} class="case__navnext">
+                  <span class="case__navlabel">Next</span>
+                  {next.data.title}
+                </a>
+              )}
+            </nav>
+          )
+        }
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .case {
+    padding-block: var(--space-2xl) var(--section-gap);
+  }
+
+  .case__head {
+    padding-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    border-bottom: var(--hairline) solid var(--rule);
+  }
+
+  .case__back {
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    color: var(--ink-muted);
+  }
+
+  .case__title {
+    max-width: 22ch;
+    margin-top: var(--space-lg);
+    font-size: var(--step-display);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+
+  /* Italic is the site's one voice change, and this is where it is used. */
+  .case__standfirst {
+    max-width: 48ch;
+    margin-top: var(--space-lg);
+    font-size: var(--step-lead);
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--ink-muted);
+  }
+
+  .case__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+    margin-top: var(--space-xl);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--ink-muted);
+  }
+
+  .case__period {
+    padding-right: var(--space-md);
+    border-right: var(--hairline) solid var(--rule);
+    color: var(--ink);
+  }
+
+  .case__nav {
+    display: grid;
+    gap: var(--space-lg);
+    margin-top: var(--space-4xl);
+    padding-top: var(--space-lg);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .case__nav a {
+    max-width: 30ch;
+    text-decoration-color: transparent;
+  }
+
+  .case__nav a:hover {
+    text-decoration-color: var(--accent);
+  }
+
+  .case__navlabel {
+    display: block;
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-xs);
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .case__nav {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .case__navnext {
+      justify-self: end;
+      text-align: right;
+    }
+  }
+</style>

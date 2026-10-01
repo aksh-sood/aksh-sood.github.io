@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import Section from './Section.astro';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+{
+  notes.length > 0 && (
+    <Section id="writing" label="Writing" eyebrow="Notes">
+      <ol class="notes">
+        {notes.slice(0, 4).map(({ id, data }) => (
+          <li class="note">
+            <h3 class="note__title">
+              <a href={`/notes/${id}`}>{data.title}</a>
+            </h3>
+            <p class="note__description">{data.description}</p>
+            <time class="note__date" datetime={data.date.toISOString()}>
+              {data.date.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </time>
+          </li>
+        ))}
+      </ol>
+    </Section>
+  )
+}
+
+<style>
+  .notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .note {
+    position: relative;
+    padding-block: var(--space-lg);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .note:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .note__title {
+    max-width: 40ch;
+    font-size: var(--step-h3);
+  }
+
+  .note__title a {
+    text-decoration-color: transparent;
+  }
+
+  .note__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .note:hover .note__title a,
+  .note__title a:focus-visible {
+    text-decoration-color: var(--accent);
+  }
+
+  .note__description {
+    max-width: 56ch;
+    margin-top: var(--space-2xs);
+    color: var(--ink-muted);
+  }
+
+  .note__date {
+    display: block;
+    margin-top: var(--space-sm);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    color: var(--ink-muted);
+  }
+</style>

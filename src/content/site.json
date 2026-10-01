@@ -1,0 +1,30 @@
+{
+  "name": "Aksh Sood",
+  "role": "Senior DevSecOps Engineer",
+  "company": "Baton Systems",
+  "availability": "Available for FDE / AI platform roles",
+  "location": "India, remote",
+  "email": "akshsood0@gmail.com",
+  "github": "https://github.com/aksh-sood",
+  "linkedin": "https://www.linkedin.com/in/akshsood/",
+  "resume": "/aksh-sood-resume.pdf",
+  "education": {
+    "degree": "B.Tech, Computer Science",
+    "school": "SRM Institute of Science and Technology",
+    "period": "2019–2023",
+    "note": "CGPA 9.14"
+  },
+  "certifications": [
+    {
+      "name": "AWS Solutions Architect",
+      "url": "https://www.credly.com/badges/6980d613-e217-4711-beb3-23dc2b45201a/public_url"
+    },
+    {
+      "name": "Terraform Associate 003",
+      "url": "https://www.credly.com/badges/ca5f78f0-1d9d-4789-9add-ffa9af4f5e32/public_url"
+    },
+    {
+      "name": "Kubernetes CKAD"
+    }
+  ]
+}

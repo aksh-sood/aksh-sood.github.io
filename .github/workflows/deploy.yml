@@ -1,0 +1,42 @@
+# Builds the Astro site and publishes it to GitHub Pages.
+#
+# Uses the artifact path (actions/deploy-pages) rather than pushing to a
+# gh-pages branch, so Jekyll never runs over the output. public/.nojekyll is
+# kept anyway as insurance — Jekyll would strip dist/_astro/ and 404 every
+# stylesheet and font.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow one deploy at a time; let a run in progress finish rather than
+# cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: withastro/action@v4
+        with:
+          node-version: 22
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

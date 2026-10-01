@@ -1,0 +1,106 @@
+---
+import { services } from '../data';
+import Slot from './Slot.astro';
+---
+
+<section class="services" id="services" aria-labelledby="services-heading">
+  <div class="container">
+    <header class="services__head">
+      <p class="eyebrow">{services.eyebrow}</p>
+      <h2 id="services-heading">{services.heading}</h2>
+      {
+        services.confirm && (
+          <div class="services__slot">
+            <Slot kind="CONFIRM">{services.confirm}</Slot>
+          </div>
+        )
+      }
+    </header>
+
+    <ul class="services__list">
+      {
+        services.items.map((item) => (
+          <li class="service">
+            <h3 class="service__title">{item.title}</h3>
+            <p class="service__body">{item.body}</p>
+            <ul class="service__tags">
+              {item.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services {
+    padding-block: var(--section-gap);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .services__head {
+    max-width: 44rem;
+  }
+
+  .services__head h2 {
+    margin-top: var(--space-xs);
+  }
+
+  .services__slot {
+    margin-top: var(--space-md);
+  }
+
+  .services__list {
+    display: grid;
+    gap: var(--space-lg);
+    margin: var(--space-2xl) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .service {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-xl);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+  }
+
+  .service__title {
+    font-size: 1.25rem;
+  }
+
+  .service__body {
+    margin-top: var(--space-sm);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+
+  .service__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin: var(--space-lg) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .service__tags li {
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: var(--paper-sunk);
+    font-family: var(--face-mono);
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 56rem) {
+    .services__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

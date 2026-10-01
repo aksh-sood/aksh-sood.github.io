@@ -1,0 +1,23 @@
+# build
+dist/
+.astro/
+node_modules/
+
+# env
+.env
+.env.production
+
+# terraform
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/terraform.tfvars
+infra/*.tfstate
+infra/*.tfstate.*
+infra/crash.log
+
+# os
+.DS_Store
+
+# The pre-template build, kept on disk as a local undo. Once this repo is under
+# git, git is the better record — do not commit the duplicate tree.
+.backup-notebook-ui/

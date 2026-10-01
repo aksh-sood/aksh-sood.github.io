@@ -1,0 +1,105 @@
+---
+import { getCollection, render } from 'astro:content';
+import Section from './Section.astro';
+
+const roles = (await getCollection('experience')).sort(
+  (a, b) => b.data.order - a.data.order,
+);
+
+const rendered = await Promise.all(
+  roles.map(async (role) => ({ ...role, Content: (await render(role)).Content })),
+);
+---
+
+<Section id="experience" label="Experience" eyebrow="Resume">
+  <ol class="roles">
+    {
+      rendered.map(({ data, Content }) => (
+        <li class="role">
+          <p class="role__period">
+            <span>{data.start}</span>
+            <span class="role__dash">–</span>
+            <span>{data.end}</span>
+          </p>
+
+          <div class="role__detail">
+            <h3 class="role__title">{data.role}</h3>
+            <p class="role__place">
+              {data.company}, {data.location}
+            </p>
+            <div class="role__body">
+              <Content />
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</Section>
+
+<style>
+  .roles {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /*
+    Four roles at one company, so the sequence is the story — but the dates and
+    the ascending titles already tell it. A connecting rule with dots would be a
+    second, louder way of saying the same thing, in a device this site uses
+    nowhere else. These are hairline-separated rows, like Work and Projects.
+  */
+  .role {
+    padding-block: var(--space-xl);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .role:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .role__period {
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--ink-muted);
+  }
+
+  .role__dash {
+    padding-inline: 0.2em;
+  }
+
+  .role__title {
+    margin-top: var(--space-2xs);
+    font-size: var(--step-h3);
+  }
+
+  .role__place {
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--ink-muted);
+  }
+
+  .role__body {
+    max-width: 58ch;
+    margin-top: var(--space-md);
+  }
+
+  .role__body :global(p + p) {
+    margin-top: var(--space-md);
+  }
+
+  @media (min-width: 64rem) {
+    /* Baseline alignment puts the date on the same line as the role title,
+       rather than nudging it with a magic padding value. */
+    .role {
+      display: grid;
+      grid-template-columns: 9rem minmax(0, 1fr);
+      column-gap: var(--space-lg);
+      align-items: baseline;
+    }
+  }
+</style>

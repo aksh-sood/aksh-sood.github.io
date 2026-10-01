@@ -1,0 +1,217 @@
+---
+import { home } from '../data';
+import Icon from './Icon.astro';
+import Sparkle from './Sparkle.astro';
+import Slot from './Slot.astro';
+
+const { stats, clients, statsBody, statsCta } = home;
+---
+
+<section class="stats" aria-labelledby="stats-heading">
+  <h2 id="stats-heading" class="visually-hidden">By the numbers</h2>
+
+  <div class="container stats__grid">
+    <Sparkle size="3.5rem" bottom="-1rem" left="-2.5rem" opacity={0.1} wideOnly />
+    <Sparkle size="5rem" top="30%" right="-3rem" opacity={0.14} wideOnly />
+
+    <div class="stats__left">
+      <dl class="counts">
+        {
+          stats.map((stat) => (
+            <div class="count">
+              {stat.value ? (
+                <dt class="count__value">
+                  {/*
+                    The rendered number is the full value, so the figure is
+                    correct with no script. The count-up only replaces it
+                    mid-animation.
+                  */}
+                  <span data-count-to={stat.value}>{stat.value}</span>
+                  {stat.suffix}
+                </dt>
+              ) : (
+                <dt class="count__value count__value--empty">
+                  {/* Keeps the counter's height so the two-up grid still reads. */}
+                  <span class="count__dash" aria-hidden="true">
+                    —
+                  </span>
+                  <Slot kind="CONFIRM">{stat.confirm}</Slot>
+                </dt>
+              )}
+              <dd class="count__caption">{stat.caption}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="clients">
+        {
+          clients.value ? (
+            <p class="clients__figure">
+              <strong>{clients.value}</strong> {clients.label}
+            </p>
+          ) : (
+            <Slot kind="CONFIRM">{clients.confirm}</Slot>
+          )
+        }
+        <span class="clients__rule" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="stats__right">
+      <p class="stats__body">{statsBody}</p>
+      <a class="btn btn--ghost" href={statsCta.href}>
+        {statsCta.label}
+        <Icon name="arrow" size="0.85em" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const counters = document.querySelectorAll<HTMLElement>('[data-count-to]');
+
+  if (counters.length && !reduced.matches && 'IntersectionObserver' in window) {
+    const run = (el: HTMLElement) => {
+      const target = Number(el.dataset.countTo);
+      if (!Number.isFinite(target)) return;
+
+      const duration = 900;
+      const start = performance.now();
+
+      const frame = (now: number) => {
+        const progress = Math.min((now - start) / duration, 1);
+        // easeOutCubic, so it decelerates onto the real number
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (progress < 1) requestAnimationFrame(frame);
+        else el.textContent = el.dataset.countTo!;
+      };
+
+      requestAnimationFrame(frame);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          run(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.6 },
+    );
+
+    counters.forEach((el) => observer.observe(el));
+  }
+</script>
+
+<style>
+  .stats {
+    position: relative;
+    padding-block: var(--section-gap);
+    overflow: hidden;
+  }
+
+  .stats__grid {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .stats__left,
+  .stats__right {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Counters ------------------------------------------------------------ */
+
+  .counts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--space-xl);
+    margin: 0;
+  }
+
+  .count__value {
+    font-family: var(--face-display);
+    font-size: var(--step-figure);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .count__dash {
+    display: block;
+    color: var(--rule-strong);
+  }
+
+  .count__value--empty {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .count__caption {
+    max-width: 16rem;
+    margin: var(--space-sm) 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--ink-muted);
+  }
+
+  /* Clients ------------------------------------------------------------- */
+
+  .clients {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-2xl);
+  }
+
+  .clients__figure {
+    font-size: 0.9375rem;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+
+  .clients__figure strong {
+    font-family: var(--face-display);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .clients__rule {
+    flex: 1;
+    min-width: 2rem;
+    height: 1px;
+    background: var(--rule-strong);
+  }
+
+  /* Right column -------------------------------------------------------- */
+
+  .stats__body {
+    max-width: 34rem;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: var(--ink-muted);
+  }
+
+  .stats__right .btn {
+    margin-top: var(--space-xl);
+  }
+
+
+  @media (min-width: 64rem) {
+    .stats__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+      gap: var(--space-4xl);
+      align-items: start;
+    }
+  }
+</style>

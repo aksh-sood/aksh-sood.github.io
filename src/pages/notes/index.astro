@@ -1,0 +1,174 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const planned = (await getCollection('notes', ({ data }) => data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<Base
+  title="Writing"
+  description="Notes on platform engineering, disaster recovery and agent systems."
+  ogImage="/og/notes.png"
+>
+  <Header />
+
+  <main id="main" class="notes-page">
+    <div class="container">
+      <h1 class="notes-page__title">Writing</h1>
+
+      {
+        notes.length > 0 ? (
+          <ol class="notes">
+            {notes.map(({ id, data }) => (
+              <li class="note">
+                <h2 class="note__title">
+                  <a href={`/notes/${id}`}>{data.title}</a>
+                </h2>
+                <p class="note__description">{data.description}</p>
+                <time class="note__date" datetime={data.date.toISOString()}>
+                  {data.date.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </time>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div class="empty">
+            <p class="empty__lead">
+              Nothing published here yet. I’d rather write one piece properly than keep a
+              posting schedule.
+            </p>
+
+            {planned.length > 0 && (
+              <>
+                <p class="empty__label">First up</p>
+                <ul class="empty__list">
+                  {planned.map(({ data }) => (
+                    <li>
+                      <span class="empty__title">{data.title}</span>
+                      <span class="empty__description">{data.description}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <p class="empty__lead">
+              In the meantime, the <a href="/#work">case studies</a> are where the detail is.
+            </p>
+          </div>
+        )
+      }
+    </div>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .notes-page {
+    padding-block: var(--space-2xl) var(--section-gap);
+  }
+
+  .notes-page__title {
+    font-size: var(--step-display);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .notes,
+  .empty__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .note {
+    position: relative;
+    padding-block: var(--space-lg);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .note__title {
+    max-width: 40ch;
+    font-size: var(--step-h2);
+  }
+
+  .note__title a {
+    text-decoration-color: transparent;
+  }
+
+  .note__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .note:hover .note__title a,
+  .note__title a:focus-visible {
+    text-decoration-color: var(--accent);
+  }
+
+  .note__description {
+    max-width: 58ch;
+    margin-top: var(--space-2xs);
+    color: var(--ink-muted);
+  }
+
+  .note__date {
+    display: block;
+    margin-top: var(--space-sm);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    color: var(--ink-muted);
+  }
+
+  /* An empty section should still say what it is for. */
+  .empty__lead {
+    max-width: 48ch;
+    font-size: var(--step-lead);
+    line-height: 1.5;
+  }
+
+  .empty__label {
+    margin-top: var(--space-2xl);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--hairline) solid var(--rule);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    color: var(--ink-muted);
+  }
+
+  .empty__list {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .empty__list li {
+    padding-top: var(--space-md);
+  }
+
+  .empty__title {
+    display: block;
+    max-width: 40ch;
+    font-size: var(--step-h3);
+  }
+
+  .empty__description {
+    display: block;
+    max-width: 56ch;
+    margin-top: var(--space-2xs);
+    color: var(--ink-muted);
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+title: Moving trade flow across two clouds we only half controlled
+summary: EKS to MSK over IRSA, EKS to GCP Pub/Sub over Workload Identity Federation, and Protobuf schemas for FX trade payloads.
+standfirst: The interesting part of an integration is rarely the transport. It is that one end of it belongs to somebody else.
+period: "2026"
+stack: [EKS, Amazon MSK, GCP Pub/Sub, IRSA, Workload Identity Federation, Protobuf]
+order: 3
+---
+
+import CrossCloud from '../../components/diagrams/CrossCloud.astro';
+
+## Context
+
+Trade flow for a global financial market infrastructure provider had to move between
+systems that did not share an owner. Some of it ran on our EKS clusters. Some of it landed
+in Kafka on Amazon MSK. Some of it had to reach services the client ran on Google Cloud.
+
+This is the work I spend most of my time on now, and the reason it is on this site: almost
+none of the difficulty is in the pipes. It is in the fact that one end of every integration
+belongs to a team you do not manage, on a schedule you do not set, inside an account you
+cannot read.
+
+## Constraint
+
+Two constraints shaped every decision.
+
+The first was credentials. The obvious way to connect a workload in one cloud to a service
+in another is a long-lived key in a secret, and for a customer with this audit posture that
+is not an option — nor should it be. Static credentials in a settlement path are a finding
+waiting to happen.
+
+The second was the schema. FX trade payloads are not a shape you get to negotiate freely:
+both ends have to agree exactly, the meaning of a field cannot drift, and a change on one
+side cannot silently break the other. Whatever we chose had to carry that agreement
+somewhere both teams could see it.
+
+<CrossCloud />
+
+## What I did
+
+For identity, I used each platform’s own federation rather than issuing anything.
+
+Within AWS, workloads reach MSK through IRSA: the pod gets a service account, the service
+account is trusted by an IAM role, and the broker authorises the role. No key is stored,
+and access is scoped to the workload rather than to the cluster.
+
+Reaching GCP is the same idea across a trust boundary. Workload Identity Federation lets
+GCP accept the Kubernetes service account token our cluster already issues as proof of
+identity, and exchange it for short-lived GCP credentials. The result is that a pod in our
+EKS cluster can publish to the client’s Pub/Sub topic without either side holding a static
+credential for the other. That property is what made the security review short.
+
+For the payloads, Protobuf. The schema is the contract, it lives in version control, both
+sides generate from it, and a field cannot change meaning without the change being visible
+as a diff. On an integration where the other team’s release schedule is not mine to control,
+having the contract be a reviewable artifact rather than a shared understanding is the
+difference between a rollout and an incident.
+
+The rest was the unglamorous part: joining their calls, walking through failure modes with
+their engineers, and debugging live inside their environment when a message did not arrive.
+A cross-cloud path has more places to be wrong than a single-cloud one, and most of them are
+only visible from the other side.
+
+## Outcome
+
+Trade-flow data moves between systems the customer does not fully control, with no static
+credentials anywhere in the path and a schema both teams can read.
+
+What I took from it is narrower than the architecture. The design that wins these is almost
+never the clever one — it is the one the other team can operate without me on the call. Both
+halves here are each platform’s native federation and a schema format their engineers
+already knew, which is why handing it over was uneventful.
+
+{/* [CONFIRM: period shown as 2026 — confirm the dates for this work] */}

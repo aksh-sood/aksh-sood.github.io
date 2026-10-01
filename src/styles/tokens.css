@@ -1,0 +1,103 @@
+/*
+  Design tokens for the dark template build.
+
+  Nothing in a component may hardcode a colour, size or space — if a value is
+  needed that isn't here, add it here first.
+
+  This build is dark-only, which is how the reference template is drawn. There
+  is no light theme and no theme toggle; the ground is a fixed near-black and
+  the accent is a single vivid orange used across buttons, figures and rules.
+*/
+
+:root {
+  color-scheme: dark;
+
+  /* Ground and surfaces ------------------------------------------------ */
+  --paper: #141414;          /* page ground                                */
+  --paper-sunk: #1c1c1c;     /* recessed panels, code blocks               */
+  --surface: #1e1e1e;        /* cards, the nav pill                        */
+  --surface-raised: #272727; /* hover state on a surface, social buttons   */
+
+  --ink: #ffffff;
+  --ink-muted: #a3a3a3;      /* body copy and captions (7.2:1 on ground)   */
+  --ink-faint: #757575;      /* disabled, fine print                       */
+
+  --rule: #2b2b2b;           /* 1px hairlines only — never text            */
+  --rule-strong: #3d3d3d;
+
+  /* Accent -------------------------------------------------------------- */
+  --accent: #f5821f;         /* buttons, figures, the logo mark            */
+  --accent-hot: #ff9436;     /* hover                                      */
+  --accent-ink: #141414;     /* text on an accent fill                     */
+  --panel: #f7b32b;          /* the yellow slab behind the portrait        */
+
+  --accent-wash: rgb(245 130 31 / 0.12);
+  --selection: rgb(245 130 31 / 0.3);
+
+  /* Type ---------------------------------------------------------------- */
+  --face-display: var(--font-display), 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --face-body: var(--font-body), 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --face-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Alias kept so components written against the previous build still resolve. */
+  --face-serif: var(--face-display);
+
+  --step-mono-xs: 0.75rem;     /* 12px — figure captions, footnotes        */
+  --step-mono-sm: 0.8125rem;   /* 13px — labels, dates, stack lists        */
+  --step-mono-md: 0.875rem;    /* 14px — nav, footer links                 */
+  --step-body: 1rem;           /* 16px — prose                             */
+  --step-lead: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  --step-h3: 1.5rem;
+  --step-h2: clamp(1.875rem, 3.4vw, 2.75rem);
+  --step-h1: clamp(2rem, 4.4vw, 3rem);
+  --step-display: clamp(2.75rem, 7.4vw, 5.5rem);   /* the hero name        */
+  --step-figure: clamp(2.5rem, 5.6vw, 4rem);       /* the orange counters  */
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.2;
+  --leading-body: 1.75;
+  --leading-mono: 1.5;
+
+  --tracking-display: -0.02em;
+  --tracking-tight: -0.01em;
+  --tracking-mono: 0.01em;
+  --tracking-nav: 0.08em;      /* the tracked caps in the nav bar          */
+
+  /* Space — 4px base ----------------------------------------------------- */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4.5rem;
+  --space-4xl: 7rem;
+  --section-gap: clamp(3.5rem, 8vw, 6.5rem);
+
+  /* Shape ---------------------------------------------------------------- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --notch: 18px;               /* the cut corner on buttons and the panel  */
+
+  --shadow-card: 0 18px 40px rgb(0 0 0 / 0.45);
+  --shadow-accent: 0 10px 28px rgb(245 130 31 / 0.28);
+
+  /* Grid ------------------------------------------------------------------ */
+  --container: 71.25rem;   /* 1140px + gutters = 1180px                     */
+  --grid-measure: 34rem;
+  --gutter: 1.25rem;
+
+  --hairline: 1px;
+  --focus-ring: 2px;
+
+  --ease: cubic-bezier(0.2, 0, 0.1, 1);
+  --duration: 200ms;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 2rem;
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "groups": [
+    {
+      "label": "AI engineering",
+      "items": [
+        "Python",
+        "LangChain",
+        "LlamaIndex",
+        "LangSmith",
+        "FastAPI",
+        "RAG",
+        "ChromaDB",
+        "Pinecone",
+        "HuggingFace",
+        "Bedrock AgentCore",
+        "Gemini",
+        "Pydantic"
+      ]
+    },
+    {
+      "label": "Observability",
+      "items": [
+        "Prometheus",
+        "Grafana",
+        "OpenSearch",
+        "Loki",
+        "Jaeger"
+      ]
+    },
+    {
+      "label": "Cloud and platform",
+      "items": [
+        "AWS",
+        "GCP",
+        "Kubernetes",
+        "Docker",
+        "Helm",
+        "ArgoCD",
+        "Flux",
+        "Atlantis",
+        "Jenkins",
+        "Karpenter",
+        "KEDA",
+        "Terraform",
+        "Terragrunt",
+        "OpenTofu",
+        "Ansible"
+      ]
+    },
+    {
+      "label": "Data and messaging",
+      "items": [
+        "PostgreSQL",
+        "Redis",
+        "Kafka/MSK",
+        "ActiveMQ",
+        "RabbitMQ",
+        "GCP Pub/Sub",
+        "Protobuf"
+      ]
+    },
+    {
+      "label": "Security and compliance",
+      "items": [
+        "Kyverno",
+        "OPA",
+        "Checkov",
+        "Trivy",
+        "Security Hub",
+        "GuardDuty",
+        "Inspector",
+        "KMS (BYOK)",
+        "External Secrets Operator",
+        "Keycloak/OIDC",
+        "Istio mTLS",
+        "CIS",
+        "SOC 2",
+        "PCI-DSS"
+      ]
+    }
+  ]
+}

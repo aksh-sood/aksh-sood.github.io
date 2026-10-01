@@ -1,0 +1,50 @@
+[
+  {
+    "id": "fleetpulse",
+    "name": "FleetPulse",
+    "tagline": "A driver portal for freight shipments with a dispatch agent drivers can chat with — active shipment, dock-slot booking, exception reporting. Booking is two-phase, hold then confirm, and each step is an atomic Postgres function, so two drivers can never take the same slot. If the agent runtime is unreachable the portal still works.",
+    "stack": [
+      "React",
+      "TypeScript",
+      "Express",
+      "LangChain",
+      "Bedrock AgentCore",
+      "Supabase",
+      "Upstash Redis",
+      "LangSmith"
+    ],
+    "demo": null,
+    "repo": "https://github.com/aksh-sood/SetHaul",
+    "featured": true,
+    "order": 1
+  },
+  {
+    "id": "lead-intelligence",
+    "name": "Lead Intelligence System",
+    "tagline": "Scores inbound leads and drafts outreach against a hybrid deterministic-semantic rubric, routing on a 2×2 of fit and intent. Batching and rate-limit recovery cut LLM API calls by 88%.",
+    "stack": [
+      "Python",
+      "LangChain",
+      "Gemini",
+      "LangSmith"
+    ],
+    "demo": null,
+    "repo": null,
+    "featured": false,
+    "order": 2
+  },
+  {
+    "id": "rag-pipeline",
+    "name": "RAG Pipeline",
+    "tagline": "Document QA over PDFs: tuned chunking, ChromaDB with HuggingFace embeddings, and an LLM re-ranking stage that beat baseline top-k retrieval.",
+    "stack": [
+      "LangChain",
+      "ChromaDB",
+      "HuggingFace"
+    ],
+    "demo": null,
+    "repo": null,
+    "featured": false,
+    "order": 3
+  }
+]

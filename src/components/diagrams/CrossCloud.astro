@@ -1,0 +1,73 @@
+---
+import '../../styles/diagram.css';
+---
+
+<figure class="diagram">
+  <svg viewBox="0 0 720 326" role="img" aria-labelledby="xc-title xc-desc">
+    <title id="xc-title">Trade flow and identity across AWS and GCP</title>
+    <desc id="xc-desc">
+      A workload on EKS reaches Amazon MSK inside AWS using IRSA, and reaches the client’s
+      GCP Pub/Sub topic using Workload Identity Federation, shown as the accented path
+      crossing the cloud boundary. No static credentials are held on either side, and both
+      ends generate from one Protobuf schema.
+    </desc>
+
+    <!-- Cloud boundaries -->
+    <path
+      class="diagram__art"
+      stroke-dasharray="3 6"
+      d="M16 40 L404 41 L403 246 L17 245 Z"></path>
+    <text class="diagram__meta" x="28" y="62">AWS — our account</text>
+
+    <path
+      class="diagram__art"
+      stroke-dasharray="3 6"
+      d="M452 41 L704 40 L703 245 L451 246 Z"></path>
+    <text class="diagram__meta" x="464" y="62">GCP — the client’s</text>
+
+    <!-- EKS workload -->
+    <path class="diagram__fill" d="M44 96 L193 97 L194 165 L45 164 Z"></path>
+    <path class="diagram__art" d="M44 96 L193 97 L194 165 L45 164 Z"></path>
+    <text class="diagram__label" x="62" y="125">EKS workload</text>
+    <text class="diagram__meta" x="62" y="145">service account</text>
+
+    <!-- MSK -->
+    <path class="diagram__art" d="M256 97 L375 96 L376 164 L255 165 Z"></path>
+    <text class="diagram__label" x="274" y="125">MSK</text>
+    <text class="diagram__meta" x="274" y="145">Kafka</text>
+
+    <!-- Pub/Sub -->
+    <path class="diagram__art" d="M492 96 L661 97 L662 165 L491 164 Z"></path>
+    <text class="diagram__label" x="510" y="125">Pub/Sub</text>
+    <text class="diagram__meta" x="510" y="145">the client’s topic</text>
+
+    <!-- In-account path: IRSA -->
+    <path class="diagram__art" d="M194 130 C 218 129, 236 131, 249 130"></path>
+    <path class="diagram__ink-fill" d="M256 130 L246 125 L246 135 Z"></path>
+    <text class="diagram__meta" x="196" y="118">IRSA</text>
+
+    <!-- Cross-cloud path: Workload Identity Federation. The one accent stroke. -->
+    <path
+      class="diagram__accent"
+      d="M118 165 C 119 196, 117 210, 160 211 L540 211 C 576 210, 576 196, 576 172"></path>
+    <path class="diagram__accent-fill" d="M576 165 L571 177 L581 177 Z"></path>
+    <text class="diagram__meta" x="168" y="232" style="fill: var(--accent)">
+      Workload Identity Federation
+    </text>
+
+    <!-- The contract -->
+    <path class="diagram__art" d="M16 280 L704 280" stroke-dasharray="3 6"></path>
+    <text class="diagram__meta" x="16" y="299">
+      Protobuf schema in version control. Both ends generate from it, so a
+    </text>
+    <text class="diagram__meta" x="16" y="313">
+      field cannot change meaning without showing up as a diff.
+    </text>
+  </svg>
+
+  <figcaption class="diagram__caption">
+    Each hop uses the platform’s own federation rather than a key somebody has to rotate.
+    The pod’s existing Kubernetes service account token is what GCP accepts, which is why
+    neither side ends up holding a credential for the other.
+  </figcaption>
+</figure>

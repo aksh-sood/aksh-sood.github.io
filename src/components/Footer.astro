@@ -1,0 +1,111 @@
+---
+import { site } from '../data';
+import Icon from './Icon.astro';
+
+const updated = new Date().toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+const socials = [
+  { name: 'github' as const, href: site.github, label: 'GitHub' },
+  { name: 'linkedin' as const, href: site.linkedin, label: 'LinkedIn' },
+  { name: 'mail' as const, href: `mailto:${site.email}`, label: 'Email' },
+];
+---
+
+<footer id="contact" class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__pitch">
+        <p class="eyebrow">Contact</p>
+        <h2 class="footer__heading">Let’s talk</h2>
+        <p class="footer__lead">
+          The quickest way to reach me is email. I read everything, and I reply to anything
+          that isn’t a template.
+        </p>
+
+        <div class="footer__actions">
+          <a class="btn" href={`mailto:${site.email}`}>{site.email}</a>
+          <a class="btn btn--ghost" href={site.resume} download>
+            Résumé (PDF)
+            <Icon name="arrow" size="0.85em" />
+          </a>
+        </div>
+      </div>
+
+      <ul class="footer__socials">
+        {
+          socials.map((social) => (
+            <li>
+              <a class="icon-btn" href={social.href} rel="me">
+                <Icon name={social.name} size="1.05rem" title={social.label} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <p class="footer__meta">
+      <span>{site.name}</span>
+      <span>{site.location}</span>
+      <span>Last updated {updated}</span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: var(--section-gap);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-xl);
+  }
+
+  .footer__heading {
+    margin-top: var(--space-xs);
+    font-size: var(--step-h2);
+  }
+
+  .footer__lead {
+    max-width: 42ch;
+    margin-top: var(--space-md);
+    font-size: 0.9375rem;
+    color: var(--ink-muted);
+  }
+
+  .footer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  .footer__socials {
+    display: flex;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-lg);
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-md);
+    border-top: var(--hairline) solid var(--rule);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-xs);
+    color: var(--ink-muted);
+  }
+</style>

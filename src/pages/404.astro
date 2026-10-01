@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base title="Page not found" description="That page doesn’t exist.">
+  <Header />
+
+  <main id="main" class="missing">
+    <div class="container">
+      <p class="missing__code">404</p>
+      <h1 class="missing__title">There’s nothing at this address.</h1>
+      <p class="missing__lead">
+        Either the link is wrong or I moved something and didn’t redirect it. The
+        <a href="/#work">case studies</a> and <a href="/notes">writing</a> are the two places
+        worth starting.
+      </p>
+    </div>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .missing {
+    padding-block: var(--space-4xl) var(--section-gap);
+  }
+
+  /* The code is the one big number on this page, set like the figures. */
+  .missing__code {
+    font-family: var(--face-mono);
+    font-size: var(--step-figure);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+  }
+
+  .missing__title {
+    max-width: 18ch;
+    margin-top: var(--space-lg);
+    font-size: var(--step-h1);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .missing__lead {
+    max-width: 46ch;
+    margin-top: var(--space-lg);
+    font-size: var(--step-lead);
+    line-height: 1.5;
+  }
+</style>

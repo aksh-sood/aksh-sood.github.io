@@ -1,0 +1,97 @@
+---
+import { pricing } from '../data';
+import Slot from './Slot.astro';
+---
+
+<section class="pricing" id="pricing" aria-labelledby="pricing-heading">
+  <div class="container">
+    <header class="pricing__head">
+      <p class="eyebrow">{pricing.eyebrow}</p>
+      <h2 id="pricing-heading">{pricing.heading}</h2>
+    </header>
+
+    {
+      pricing.tiers.length > 0 ? (
+        <ul class="tiers">
+          {pricing.tiers.map((tier) => (
+            <li class="tier">
+              <h3 class="tier__name">{tier.name}</h3>
+              <p class="tier__price">{tier.price}</p>
+              <p class="tier__body">{tier.body}</p>
+              <ul class="tier__includes">
+                {tier.includes.map((line) => (
+                  <li>{line}</li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="pricing__slot">
+            <Slot kind="CONFIRM">{pricing.confirm}</Slot>
+          </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .pricing {
+    padding-block: var(--section-gap);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .pricing__head {
+    max-width: 44rem;
+  }
+
+  .pricing__head h2 {
+    margin-top: var(--space-xs);
+  }
+
+  .pricing__slot {
+    margin-top: var(--space-lg);
+  }
+
+  .tiers {
+    display: grid;
+    gap: var(--space-lg);
+    margin: var(--space-2xl) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tier {
+    padding: var(--space-xl);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+  }
+
+  .tier__price {
+    margin-top: var(--space-xs);
+    font-family: var(--face-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .tier__body {
+    margin-top: var(--space-sm);
+    font-size: 0.9375rem;
+    color: var(--ink-muted);
+  }
+
+  .tier__includes {
+    margin: var(--space-lg) 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 56rem) {
+    .tiers {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

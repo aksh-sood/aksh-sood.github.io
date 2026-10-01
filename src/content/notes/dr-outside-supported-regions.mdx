@@ -1,0 +1,108 @@
+---
+title: What I learned running DR outside vendor-supported regions
+description: The managed replication feature covered plenty of region pairs, just not ours. Notes on what I’d do differently.
+date: 2026-09-30
+draft: false
+---
+
+Last year I built multi-region disaster recovery for settlement messaging, and the managed
+feature that was supposed to do it turned out not to work where we needed it. The
+[case study](/work/dr-outside-supported-regions) covers what we shipped. This is the part
+that generalises — the things I'd tell another engineer before they start.
+
+## Check the capability matrix before you design around the feature
+
+The managed broker offers cross-region replication. It is the obvious answer, it is
+well documented, and I had already sketched the design around it before I read the
+supported-region list closely enough.
+
+It supports specific region pairs. Ours was not one of them. The feature replicated
+happily between plenty of regions we had no permission to use, and not between the three
+we did.
+
+This is the mistake I'd most like back. Managed-service capabilities are not uniform
+across geography, and the documentation usually presents the feature first and the matrix
+second — a table further down the page, or a separate page entirely. If your region set is
+driven by something you don't control, like a regulatory footprint, **read the matrix
+before the feature description**. Ten minutes at the start would have saved a week of
+designing something that could not be built.
+
+The broader version: when a managed service is on the critical path of a design, find the
+constraint page before you find the tutorial.
+
+## When the abstraction doesn't fit, drop a level
+
+Once replication was off the table, the options were all bad in familiar ways. Move the
+workload to a supported region pair — except the geography came from the client's
+regulatory position and was not ours to move. Accept a longer recovery objective and
+restore from backups — except restoring a broker from backup loses in-flight messages, and
+in settlement the in-flight messages are precisely the ones that matter. Write our own
+replication on top of the broker — a thing people do, and then maintain forever.
+
+What actually worked was changing the noun. I stopped looking for *replication* and
+started looking for *reachability*.
+
+ActiveMQ has had a network of brokers for a very long time: brokers that know about each
+other and forward messages across the link when a consumer is attached on the far side.
+It is not a replication feature. That is the whole point — the region-pair restriction is
+a property of the managed replication feature, not of brokers talking to brokers over a
+network I control.
+
+The lesson I'd keep: a managed feature is a convenience wrapper over a primitive, and the
+restrictions usually live in the wrapper. When the wrapper doesn't fit your case, the
+primitive underneath is often unrestricted, older, better documented, and more boring. In
+infrastructure, boring is a feature.
+
+## Automatic failover is the wrong default for stateful messaging
+
+This is where I spent the most time, and it was not build time — it was deciding what
+counted as "failed".
+
+The instinct is to automate the failover. For stateless services, sure. For a message
+broker carrying settlement traffic, automatic failover on a network partition is how you
+end up with two regions both believing they are primary. Two brokers accepting writes for
+the same flow is a worse outcome than being down, because being down is obvious and
+recoverable, and split-brain is neither.
+
+So the failover is deliberate: monitored continuously, triggered by a human, executed by a
+written procedure. And the procedure has to be short enough that a human under pressure at
+an unreasonable hour can follow it correctly — which is a real design constraint on the
+topology, not a documentation task you do afterwards.
+
+If you take one thing: decide whether split-brain or downtime is worse for your data
+*before* you decide whether failover is automatic. The answer determines the design.
+
+## Measure the recovery objective by running it
+
+A recovery objective you estimated is a number in a slide. A recovery objective you
+measured is a number you can defend.
+
+We ran the failover rather than diagramming it, and timed it from decision to traffic
+served from the passive region. That gave us a real figure, and it went into the client's
+audit position precisely because it came from an exercise.
+
+Running it also surfaced things the diagram could not. The procedure had a step that read
+clearly on paper and was ambiguous at 3am. You only find that by doing it.
+
+## The design somebody else can read is worth more than the short one
+
+The result I did not anticipate was the conversation.
+
+Because the topology is ordinary broker networking rather than a proprietary feature, the
+client's own engineers could read it, reason about it live on a call, and ask pointed
+questions. That is what it looks like when somebody actually understands their own
+disaster recovery position, and it is worth more than a shorter design document.
+
+A managed feature we did not control would have given us less to explain and a much worse
+conversation. When you are working inside somebody else's environment, the artifact you
+leave behind is not the system — it's their ability to run it without you.
+
+## And put it in code
+
+Small one to finish on. The whole topology is defined in Terraform, which matters more than
+it sounds. A DR topology that exists because somebody configured it by hand is a DR
+topology that drifts, and the drift is invisible until the day you need it. The failover
+test verifies the procedure; the code is what keeps the thing you tested and the thing you
+have from diverging.
+
+{/* [CONFIRM: this note follows the case study in naming the managed broker as Amazon MQ for ActiveMQ — confirm both together before publishing.] */}

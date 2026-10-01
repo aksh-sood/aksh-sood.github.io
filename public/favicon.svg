@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The nav wordmark's glyph on the page ground: the A and its swoosh. -->
+  <rect width="32" height="32" rx="7" fill="#141414"/>
+  <g fill="none" stroke="#F5821F" stroke-width="3.2" stroke-linecap="round">
+    <path d="M6.5 25.5 L14 8.5 L21.5 25.5" stroke-linejoin="round"/>
+    <path d="M10.2 20 H17.8"/>
+    <path d="M18.5 9.5 C 22 6.5, 25.5 7, 27.5 10"/>
+  </g>
+</svg>

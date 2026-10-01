@@ -1,0 +1,419 @@
+---
+import { NAV, NAV_CTA } from '../consts';
+import { site } from '../data';
+import Icon from './Icon.astro';
+
+const { pathname } = Astro.url;
+const isCurrent = (href: string) =>
+  href.startsWith('/notes') && pathname.startsWith('/notes');
+---
+
+{/*
+  The reference template's floating pill bar: a rounded dark slab inset from the
+  page edges, wordmark left, tracked-caps nav centre, a light CTA pill right.
+  Below 60rem the run collapses behind a toggle.
+*/}
+<header class="bar">
+  <div class="bar__inner">
+    <a class="mark" href="/" aria-label={`${site.name} — home`}>
+      <svg class="mark__glyph" viewBox="0 0 34 30" aria-hidden="true" focusable="false">
+        <path d="M2 28 L13 3 L24 28 L18.6 28 L13 14.2 L7.4 28 Z" fill="currentColor"></path>
+        <path d="M8.5 21.5 H17.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+        ></path>
+        <path
+          d="M15 4.5 C 21 0.5, 28 1.5, 32 6.5"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          fill="none"></path>
+      </svg>
+      <span class="mark__word">ksh</span>
+    </a>
+
+    <button
+      class="burger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-menu-toggle
+    >
+      <span class="visually-hidden">Menu</span>
+      <span class="burger__bars" aria-hidden="true"></span>
+    </button>
+
+    <nav class="nav" id="site-nav" aria-label="Primary">
+      <ul class="nav__list">
+        {
+          NAV.map((item) =>
+            'children' in item ? (
+              <li class="nav__item nav__item--has-menu">
+                {/*
+                  A real button for the disclosure, so it is reachable by
+                  keyboard and announces its state. The link itself stays
+                  separately clickable.
+                */}
+                <span class="nav__pair">
+                  <a class="nav__link" href={item.href}>
+                    {item.label}
+                  </a>
+                  <button
+                    class="nav__disclosure"
+                    type="button"
+                    aria-expanded="false"
+                    data-submenu-toggle
+                  >
+                    <span class="visually-hidden">{`Show ${item.label} sections`}</span>
+                    <Icon name="chevron" size="0.85rem" class="nav__chevron" />
+                  </button>
+                </span>
+
+                <ul class="submenu">
+                  {item.children.map((child) => (
+                    <li>
+                      <a href={child.href}>{child.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : (
+              <li class="nav__item">
+                <a
+                  class="nav__link"
+                  href={item.href}
+                  aria-current={isCurrent(item.href) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )
+        }
+      </ul>
+
+      <a class="talk" href={NAV_CTA.href}>
+        {NAV_CTA.label}
+        <Icon name="arrow" size="0.8rem" />
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const menu = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const bar = document.querySelector<HTMLElement>('.bar');
+
+  menu?.addEventListener('click', () => {
+    const open = menu.getAttribute('aria-expanded') === 'true';
+    menu.setAttribute('aria-expanded', String(!open));
+    bar?.classList.toggle('is-open', !open);
+  });
+
+  // Disclosure submenus. Click rather than hover, so the same interaction
+  // works on touch and by keyboard.
+  const toggles = document.querySelectorAll<HTMLButtonElement>('[data-submenu-toggle]');
+
+  const closeAll = (except?: Element) => {
+    toggles.forEach((t) => {
+      if (t === except) return;
+      t.setAttribute('aria-expanded', 'false');
+      t.closest('.nav__item')?.classList.remove('is-open');
+    });
+  };
+
+  toggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      closeAll(toggle);
+      toggle.setAttribute('aria-expanded', String(!open));
+      toggle.closest('.nav__item')?.classList.toggle('is-open', !open);
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target as Element)?.closest('.nav__item--has-menu')) closeAll();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    closeAll();
+    if (menu?.getAttribute('aria-expanded') === 'true') {
+      menu.setAttribute('aria-expanded', 'false');
+      bar?.classList.remove('is-open');
+      menu.focus();
+    }
+  });
+</script>
+
+<style>
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: var(--space-md) var(--gutter);
+  }
+
+  .bar__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    max-width: var(--container);
+    margin-inline: auto;
+    padding: 0.625rem 0.625rem 0.625rem 1.5rem;
+    background: var(--surface);
+    border-radius: var(--radius-pill);
+  }
+
+  /* Wordmark ----------------------------------------------------------- */
+
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+    margin-right: auto;
+    color: var(--ink);
+    font-family: var(--face-display);
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .mark:hover {
+    color: var(--ink);
+  }
+
+  .mark__glyph {
+    width: 1.55rem;
+    height: 1.375rem;
+    color: var(--accent);
+    overflow: visible;
+  }
+
+  .mark__word {
+    margin-left: -0.08em;
+  }
+
+  /* Nav ---------------------------------------------------------------- */
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .nav__list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav__item {
+    position: relative;
+  }
+
+  .nav__pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .nav__link {
+    font-family: var(--face-display);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: var(--tracking-nav);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .nav__link:hover,
+  .nav__link[aria-current='page'] {
+    color: var(--accent);
+  }
+
+  .nav__disclosure {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--ink-muted);
+    cursor: pointer;
+  }
+
+  .nav__chevron {
+    transition: transform var(--duration) var(--ease);
+  }
+
+  .nav__item.is-open .nav__chevron {
+    transform: rotate(180deg);
+  }
+
+  .nav__item.is-open .nav__disclosure {
+    color: var(--accent);
+  }
+
+  /* Submenu ------------------------------------------------------------ */
+
+  .submenu {
+    display: none;
+    margin: 0;
+    padding: var(--space-xs);
+    list-style: none;
+  }
+
+  .nav__item.is-open .submenu {
+    display: block;
+  }
+
+  .submenu a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--face-display);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .submenu a:hover {
+    background: var(--surface-raised);
+    color: var(--ink);
+  }
+
+  /* The CTA pill ------------------------------------------------------- */
+
+  .talk {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.25rem;
+    background: var(--ink);
+    color: var(--accent-ink);
+    border-radius: var(--radius-pill);
+    font-family: var(--face-display);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--duration) var(--ease);
+  }
+
+  .talk:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+
+  /* Burger ------------------------------------------------------------- */
+
+  .burger {
+    display: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    background: none;
+    border: 0;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .burger__bars,
+  .burger__bars::before,
+  .burger__bars::after {
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+  }
+
+  .burger__bars::before,
+  .burger__bars::after {
+    content: '';
+    position: relative;
+  }
+
+  .burger__bars::before {
+    top: -6px;
+  }
+
+  .burger__bars::after {
+    top: 4px;
+  }
+
+  /* Desktop: the submenu floats. Mobile: the whole run stacks. --------- */
+
+  @media (min-width: 60rem) {
+    .submenu {
+      position: absolute;
+      top: calc(100% + 0.75rem);
+      left: -0.5rem;
+      min-width: 11rem;
+      background: var(--surface-raised);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+    }
+  }
+
+  @media (max-width: 59.999rem) {
+    .bar__inner {
+      flex-wrap: wrap;
+      padding: 0.625rem 0.75rem 0.625rem 1.25rem;
+      border-radius: var(--radius-lg);
+    }
+
+    .burger {
+      display: grid;
+    }
+
+    .nav {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-xs) var(--space-xs);
+    }
+
+    .bar.is-open .nav {
+      display: flex;
+    }
+
+    .nav__list {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-xs);
+    }
+
+    .nav__link {
+      display: block;
+      padding: 0.5rem 0.25rem;
+    }
+
+    .nav__pair {
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .nav__disclosure {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .submenu {
+      padding-left: var(--space-md);
+    }
+
+    .talk {
+      justify-content: center;
+    }
+  }
+</style>

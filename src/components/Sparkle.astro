@@ -1,0 +1,86 @@
+---
+/*
+  The four-point star scattered through the reference template. Purely
+  decorative, so it is hidden from assistive technology and takes no pointer
+  events.
+
+  Placement is passed in as props rather than set from the parent's stylesheet:
+  a parent's scoped styles do not reach a child component's root element, so
+  `.hero__spark { top: … }` in Hero.astro would never match this svg.
+*/
+interface Props {
+  /** Any CSS length. */
+  size?: string;
+  top?: string;
+  right?: string;
+  bottom?: string;
+  left?: string;
+  opacity?: number;
+  /** Stacking order. Decoration sits at 0; pass 1 to clear a sibling. */
+  z?: number;
+  /** Render only at the wide layout, where there is room beside the copy. */
+  wideOnly?: boolean;
+  class?: string;
+}
+
+const {
+  size = '1.5rem',
+  top,
+  right,
+  bottom,
+  left,
+  opacity = 0.9,
+  z,
+  wideOnly = false,
+  class: className,
+} = Astro.props;
+
+const style = Object.entries({
+  '--sparkle-size': size,
+  top,
+  right,
+  bottom,
+  left,
+  opacity,
+  'z-index': z,
+})
+  .filter(([, value]) => value !== undefined)
+  .map(([key, value]) => `${key}:${value}`)
+  .join(';');
+---
+
+<svg
+  class:list={['sparkle', wideOnly && 'sparkle--wide', className]}
+  style={style}
+  viewBox="0 0 100 100"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path
+    d="M50 0 C 52.5 30, 70 47.5, 100 50 C 70 52.5, 52.5 70, 50 100 C 47.5 70, 30 52.5, 0 50 C 30 47.5, 47.5 30, 50 0 Z"
+    fill="currentColor"></path>
+</svg>
+
+<style>
+  /* Decoration that would otherwise land on a line of copy in one column. */
+  .sparkle--wide {
+    display: none;
+  }
+
+  .sparkle {
+    width: var(--sparkle-size);
+    height: var(--sparkle-size);
+    position: absolute;
+    /* Behind copy: the reference scatters these across the ground, never over
+       a line of text. */
+    z-index: 0;
+    pointer-events: none;
+    color: var(--ink);
+  }
+
+  @media (min-width: 64rem) {
+    .sparkle--wide {
+      display: block;
+    }
+  }
+</style>

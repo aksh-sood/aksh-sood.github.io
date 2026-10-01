@@ -1,0 +1,77 @@
+---
+/*
+  An unfilled content slot.
+
+  The reference template has panels the source material cannot fill — a
+  projects-completed count, a client count, a portrait, a video. Rather than
+  inventing figures, those render this: a small tag naming the kind of gap, and
+  the note explaining what is needed. It is deliberately legible so an unfilled
+  slot can never be mistaken for real content, but compact enough that the
+  surrounding layout still reads as the template it is copying.
+*/
+interface Props {
+  kind: 'CONFIRM' | 'ADD';
+  /**
+   * Which ground the marker sits on. Set here rather than by the caller: a
+   * parent's scoped selector does not reach this component's root, so a
+   * `.panel__slot { background: … }` override would silently do nothing and
+   * leave the note unreadable on the yellow slab.
+   */
+  tone?: 'ground' | 'panel';
+  class?: string;
+}
+
+const { kind, tone = 'ground', class: className } = Astro.props;
+---
+
+<span class:list={['slot-mark', `slot-mark--${tone}`, className]} data-slot={kind}>
+  <span class="slot-mark__tag">{kind}</span>
+  <span class="slot-mark__note"><slot /></span>
+</span>
+
+<style>
+  .slot-mark {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-width: 24rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius-sm);
+    text-align: left;
+  }
+
+  .slot-mark--ground {
+    background: var(--accent-wash);
+  }
+
+  /* On the yellow slab the wash is transparent enough that the note composites
+     against the panel and drops below AA. This ground is opaque. */
+  .slot-mark--panel {
+    background: var(--paper);
+    border-color: var(--accent);
+  }
+
+  .slot-mark__tag {
+    align-self: flex-start;
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--face-mono);
+    font-size: 0.625rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 1.6;
+  }
+
+  .slot-mark__note {
+    font-family: var(--face-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--ink-muted);
+    text-transform: none;
+  }
+</style>

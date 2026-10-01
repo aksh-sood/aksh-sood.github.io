@@ -1,0 +1,75 @@
+---
+title: Disaster recovery outside the regions the vendor supported
+summary: FX settlement messaging had to fail over between Oregon, London and Ireland — a combination the managed replication feature didn’t cover.
+standfirst: The managed service replicated between regions we couldn’t use, and not between the ones we needed. So we stopped using the managed feature and built the topology ourselves.
+period: 2024–2025
+stack: [ActiveMQ, Amazon MQ, Terraform, AWS, Route 53]
+order: 1
+---
+
+import DrTopology from '../../components/diagrams/DrTopology.astro';
+
+## Context
+
+A global financial market infrastructure provider settles foreign-exchange trades on our
+platform. Settlement runs on messaging, and messaging is the part that cannot quietly
+degrade — if a broker stops accepting messages, trades stop moving, and the people on the
+other end notice within minutes rather than hours.
+
+The client needed a disaster recovery position they could put in front of their own
+auditors: a named passive region, a tested failover procedure, and a recovery objective
+somebody had actually measured rather than estimated. Their regulatory footprint set the
+geography. Oregon was primary. London and Ireland were where the data was allowed to go.
+
+<DrTopology />
+
+## Constraint
+
+The managed message broker offers cross-region replication, which is the obvious answer and
+the one I wanted to use. It only supports specific region pairs, and ours was not one of
+them. The feature replicated between plenty of regions we had no permission to use, and not
+between the three we did.
+
+That left the usual bad options. We could have moved the workload to a supported pair, but
+the region choice came from the client’s regulatory position and was not ours to change. We
+could have accepted a longer recovery objective and restored from backups, but restoring a
+broker from backup loses in-flight messages, and in-flight settlement messages are exactly
+the ones that matter. We could have written our own replication on top of the broker, which
+is a thing people do and then maintain forever.
+
+## What I did
+
+I stopped treating replication as the mechanism and treated reachability as the mechanism
+instead.
+
+ActiveMQ has had a network of brokers for a long time: brokers that know about each other
+and forward messages across the link when a consumer is attached on the far side. It is not
+a replication feature, so the managed region-pair restriction does not apply to it. It is
+just brokers talking to brokers over a network I control.
+
+So the topology became three brokers, one per region, joined as a network, with Oregon
+active and the other two passive. Producers and consumers connect through a single endpoint
+rather than to a broker directly, so a failover is a change in where that endpoint points
+rather than a change every client application has to make. The whole thing is defined in
+Terraform, which mattered more than it sounds: a DR topology that only exists because
+somebody configured it by hand is a DR topology that drifts.
+
+The part that took the longest was not building it. It was deciding what counted as
+failed. Automatic failover on a network partition is how you end up with two regions both
+believing they are primary, and for settlement messaging that is a worse outcome than being
+down. So the failover is deliberate: monitored continuously, triggered by a human, and
+executed by a procedure short enough that a human under pressure can follow it correctly.
+
+## Outcome
+
+We ran the failover rather than diagrammed it, and measured a recovery objective of ten
+minutes from decision to traffic served from the passive region. That number went into the
+client’s audit position because it came from an exercise, not an estimate.
+
+The more useful result was quieter. Because the topology is ordinary broker networking
+rather than a proprietary feature, the client’s engineers could read it, reason about it on
+a call, and ask the kind of pointed questions that mean somebody actually understands their
+own DR. A managed feature we didn’t control would have given us a shorter design document
+and a much worse conversation.
+
+{/* [CONFIRM: the managed broker is named here as Amazon MQ for ActiveMQ — confirm before publishing, and confirm the 2024–2025 period] */}

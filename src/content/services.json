@@ -1,0 +1,25 @@
+{
+  "eyebrow": "What I do",
+  "heading": "Services",
+  "confirm": "The \"Services\" frame. The reference template sells services to clients; Aksh is employed and applying for roles, so these three are written as capability areas drawn from real work rather than as an offer. Confirm the framing, or rename this section to \"What I do\" and drop the nav label.",
+  "items": [
+    {
+      "id": "platform",
+      "title": "Platform engineering",
+      "body": "AWS and Kubernetes platforms built to be handed over: 28 production EKS clusters across 300+ nodes, autoscaling on Karpenter, VPA and KEDA, and the Terraform that stands the whole thing up.",
+      "tags": ["AWS", "EKS", "Terraform", "Karpenter"]
+    },
+    {
+      "id": "deployed",
+      "title": "Forward-deployed delivery",
+      "body": "Working inside a customer's environment rather than behind a ticket queue — on the call while the requirement is still vague, and on it until the system runs in their account under their constraints.",
+      "tags": ["Customer environments", "Multi-region DR", "Cross-cloud"]
+    },
+    {
+      "id": "agents",
+      "title": "LLM and agent systems",
+      "body": "Agents that hold a conversation and then go do something: LangChain on Bedrock AgentCore, retrieval pipelines with tuned chunking and re-ranking, and the evaluation loop that keeps them honest.",
+      "tags": ["LangChain", "Bedrock AgentCore", "RAG", "LangSmith"]
+    }
+  ]
+}

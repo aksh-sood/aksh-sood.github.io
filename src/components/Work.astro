@@ -1,0 +1,121 @@
+---
+import { getCollection } from 'astro:content';
+import Section from './Section.astro';
+
+const entries = (await getCollection('work', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<Section id="work" label="Selected work" eyebrow="Portfolio">
+  <ol class="work">
+    {
+      entries.map((entry) => (
+        <li class="work__row">
+          <h3 class="work__title">
+            <a href={`/work/${entry.id}`}>{entry.data.title}</a>
+          </h3>
+          <p class="work__summary">{entry.data.summary}</p>
+          <p class="work__meta">
+            <span class="work__period">{entry.data.period}</span>
+            {entry.data.stack.map((item) => (
+              <span class="work__tool">{item}</span>
+            ))}
+          </p>
+        </li>
+      ))
+    }
+  </ol>
+</Section>
+
+<style>
+  .work {
+    display: grid;
+    gap: var(--space-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Cards rather than hairline rows, matching the tiles the reference uses
+     everywhere else on the page. */
+  .work__row {
+    position: relative;
+    padding: var(--space-xl);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    transition: background-color var(--duration) var(--ease);
+  }
+
+  .work__row:hover {
+    background: var(--surface-raised);
+  }
+
+  .work__title {
+    max-width: 24ch;
+    font-size: 1.375rem;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .work__title a {
+    text-decoration-color: transparent;
+  }
+
+  /* One focusable element, whole-row hit area. */
+  .work__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .work__row:hover .work__title a,
+  .work__title a:focus-visible {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  .work__summary {
+    margin-top: var(--space-sm);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--ink-muted);
+  }
+
+  .work__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs) var(--space-md);
+    margin-top: var(--space-lg);
+    font-family: var(--face-mono);
+    font-size: var(--step-mono-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--ink-muted);
+  }
+
+  /* The period is the one piece of metadata that isn't a tool, so it keeps a
+     hairline of its own rather than a separator character. */
+  .work__period {
+    padding-right: var(--space-md);
+    border-right: var(--hairline) solid var(--rule);
+    color: var(--ink);
+  }
+
+  @media (min-width: 56rem) {
+    .work {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .work__row {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Pushes the metadata to the card foot so three cards of different copy
+       lengths still line their tool lists up. */
+    .work__meta {
+      margin-top: auto;
+      padding-top: var(--space-lg);
+    }
+  }
+</style>

@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+
+domain_name               = "akshsood.com"
+subject_alternative_names = ["www.akshsood.com"]
+bucket_name               = "akshsood-com-site"
+hosted_zone_id            = "Z0123456789ABCDEFGHIJ"
+aws_region                = "ap-south-1"

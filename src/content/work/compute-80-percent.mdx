@@ -1,0 +1,77 @@
+---
+title: Taking 80% out of compute without taking the headroom with it
+summary: A Graviton migration and right-sizing removed $180K a year. Rebuilding autoscaling on Karpenter, VPA and KEDA removed most of what was left.
+standfirst: Most of the cost was not in what we were running. It was in the gap between what we had asked for and what we actually used.
+period: 2024–2025
+stack: [Karpenter, VPA, KEDA, Graviton, EKS, Terraform]
+order: 2
+---
+
+import ScalingCurve from '../../components/diagrams/ScalingCurve.astro';
+
+## Context
+
+We ran a production Kubernetes fleet for financial infrastructure customers. It had grown
+the way these things grow: a cluster per customer, sensible instance choices made two years
+earlier, and resource requests copied from whatever the last service asked for. Nothing was
+wrong. It was just expensive, and nobody could say precisely why.
+
+Cost work on a platform like this has a trap in it. The workloads are settlement-adjacent,
+so a saving that costs you headroom during a busy period is not a saving — it is a deferred
+incident. Anything I did had to survive a traffic spike.
+
+## Constraint
+
+Two things narrowed the options.
+
+The first was that I could not schedule downtime to do it. These are production clusters
+serving customers who did not ask to participate in a cost exercise, so every change had to
+be a rolling one that could be stopped halfway.
+
+The second was that I did not trust the numbers we had. Resource requests in a fleet that
+has grown organically tell you what somebody once typed, not what the workload uses. Before
+changing anything I needed actual utilisation, which meant the observability work had to
+come first.
+
+## What I did
+
+I went after the two costs separately, because they have different shapes.
+
+The first is the price of a unit of compute. Graviton is materially cheaper per unit than
+the equivalent x86 instance, so the win there is arithmetic — provided everything you run
+has an arm64 image and nothing in the dependency chain quietly doesn’t. Most of that
+migration was not Kubernetes work at all. It was finding the containers that only existed
+as amd64, working out which ones had arm64 upstream and which needed rebuilding, and moving
+them across without a flag day. Alongside it I right-sized what was left, using the
+utilisation data rather than the requests.
+
+<ScalingCurve />
+
+The second cost is the gap between capacity you are paying for and capacity you are using,
+and that one is structural. Cluster Autoscaler works from node groups you define in advance,
+which means you are still the one guessing at instance shapes, and you are still paying for
+the rounding error on every guess.
+
+Karpenter removes the guess. It looks at the pods that cannot be scheduled and provisions
+the instance that actually fits them, from a much wider pool of types, and consolidates
+nodes back down when the workload shrinks. VPA fixed the requests themselves, so the pods
+Karpenter was packing were asking for something close to what they used. KEDA handled the
+workloads whose demand is driven by a queue rather than by CPU, so they scale on the thing
+that actually predicts load.
+
+The headroom question I answered by keeping it explicit rather than incidental. The old
+fleet had slack because the sizing was loose — spare capacity nobody had decided on. The new
+one has slack because consolidation is tuned to leave it. That is a smaller amount of
+headroom, but it is a chosen amount, and it holds through a spike because it was sized
+against observed spikes rather than against a guess.
+
+## Outcome
+
+The Graviton migration and right-sizing took $180,000 a year off the bill. Rebuilding
+autoscaling on Karpenter, VPA and KEDA cut compute cost by a further 80%, and performance
+held through traffic spikes.
+
+The change I would actually defend is the third one, which does not appear on the invoice:
+the fleet now reports what it uses. Before this, a question about capacity was a research
+project. Now it is a dashboard, which is what made every subsequent cost conversation with
+the client short.

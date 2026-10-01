@@ -1,0 +1,114 @@
+/*
+  Long-form body copy for case studies and notes.
+
+  At wide sizes the article is a grid: section headings sit in the notebook
+  margin, prose runs in the measure column, and figures may take the bleed lane.
+  Default (sparse) auto-placement is what makes this work — an item given an
+  explicit earlier column forces the cursor onto a new row, so a heading lands
+  beside the paragraph that follows it rather than beside the one above.
+*/
+
+.prose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--space-md);
+}
+
+.prose > * {
+  min-width: 0;
+}
+
+.prose h2 {
+  margin-top: var(--space-xl);
+  font-family: var(--face-mono);
+  font-size: var(--step-mono-sm);
+  line-height: var(--leading-mono);
+  letter-spacing: var(--tracking-mono);
+  color: var(--ink-muted);
+}
+
+.prose h3 {
+  margin-top: var(--space-lg);
+  font-size: var(--step-h3);
+}
+
+.prose p {
+  max-width: 68ch;
+}
+
+.prose a {
+  text-decoration-color: var(--accent);
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose ul,
+.prose ol {
+  max-width: 66ch;
+  padding-left: 1.2em;
+}
+
+.prose li + li {
+  margin-top: var(--space-xs);
+}
+
+.prose li::marker {
+  color: var(--ink-muted);
+}
+
+.prose blockquote {
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--rule-strong);
+  font-style: italic;
+  color: var(--ink-muted);
+}
+
+.prose pre {
+  padding: var(--space-md);
+  overflow-x: auto;
+  background: var(--paper-sunk);
+  border: var(--hairline) solid var(--rule);
+  font-size: var(--step-mono-sm);
+  line-height: 1.6;
+}
+
+.prose :not(pre) > code {
+  padding: 0.1em 0.3em;
+  background: var(--paper-sunk);
+  border: var(--hairline) solid var(--rule);
+}
+
+.prose hr {
+  margin-block: var(--space-xl);
+  border: 0;
+  border-top: var(--hairline) solid var(--rule);
+}
+
+@media (min-width: 64rem) {
+  .prose {
+    grid-template-columns:
+      minmax(0, 13rem)
+      minmax(0, var(--grid-measure))
+      minmax(0, 1fr);
+    column-gap: var(--space-3xl);
+    align-items: baseline;
+  }
+
+  .prose > * {
+    grid-column: 2;
+  }
+
+  .prose > h2 {
+    grid-column: 1;
+    margin-top: 0;
+    text-wrap: pretty;
+  }
+
+  /* Diagrams are the only thing allowed into the bleed lane. */
+  .prose > figure {
+    grid-column: 2 / -1;
+    align-self: start;
+  }
+}

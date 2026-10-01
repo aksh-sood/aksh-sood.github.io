@@ -1,0 +1,60 @@
+---
+interface Props {
+  id: string;
+  /** Section name. Rendered as the h2. */
+  label: string;
+  /** The tracked-caps line above the heading. Defaults to the label. */
+  eyebrow?: string;
+  /** Short line under the heading. */
+  intro?: string;
+  /** Retained for call sites; the template stacks every section the same way. */
+  wide?: boolean;
+}
+
+const { id, label, eyebrow, intro } = Astro.props;
+---
+
+{/*
+  The reference template heads every section the same way: a tracked-caps
+  eyebrow, a heavy display heading beneath it, then the content full-width.
+  Nothing sits in a margin column.
+*/}
+<section id={id} class="section">
+  <div class="container">
+    <header class="section__head">
+      <p class="eyebrow">{eyebrow ?? label}</p>
+      <h2 class="section__title">{label}</h2>
+      {intro && <p class="section__intro">{intro}</p>}
+    </header>
+
+    <div class="section__body">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: var(--section-gap);
+    border-top: var(--hairline) solid var(--rule);
+  }
+
+  .section__head {
+    max-width: 44rem;
+  }
+
+  .section__title {
+    margin-top: var(--space-xs);
+  }
+
+  .section__intro {
+    margin-top: var(--space-md);
+    font-size: 0.9375rem;
+    color: var(--ink-muted);
+  }
+
+  .section__body {
+    min-width: 0;
+    margin-top: var(--space-2xl);
+  }
+</style>

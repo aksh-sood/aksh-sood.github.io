@@ -1,0 +1,116 @@
+---
+import { home } from '../data';
+import Icon from './Icon.astro';
+import Sparkle from './Sparkle.astro';
+import Slot from './Slot.astro';
+
+const { media } = home;
+---
+
+<section class="media" aria-labelledby="media-heading">
+  <h2 id="media-heading" class="visually-hidden">Media</h2>
+
+  <div class="container media__grid">
+    <Sparkle size="4.5rem" bottom="6%" left="-3rem" opacity={0.12} wideOnly />
+    <Sparkle size="6.5rem" top="-2rem" right="-4rem" opacity={0.18} wideOnly />
+
+    {
+      media.map((item) => (
+        <figure class:list={['tile', `tile--${item.kind}`]}>
+          {item.src ? (
+            <img class="tile__img" src={item.src} alt={item.caption} width="760" height="470" />
+          ) : (
+            <div class="tile__stack">
+              {item.kind === 'video' && (
+                <span class="tile__play" aria-hidden="true">
+                  <Icon name="play" size="1.5rem" class="tile__play-icon" />
+                </span>
+              )}
+              <Slot kind="ADD">{item.add}</Slot>
+            </div>
+          )}
+
+          {/* With artwork in place the badge overlays it, as in the reference. */}
+          {item.src && item.kind === 'video' && (
+            <span class="tile__play tile__play--over" aria-hidden="true">
+              <Icon name="play" size="1.5rem" class="tile__play-icon" />
+            </span>
+          )}
+
+          <figcaption class="visually-hidden">{item.caption}</figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .media {
+    position: relative;
+    padding-bottom: var(--section-gap);
+    overflow: hidden;
+  }
+
+  .media__grid {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .tile {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: var(--space-lg);
+    aspect-ratio: 16 / 10;
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .tile__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tile__stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  /*
+    The play badge is decoration until there is a video to attach it to, so it
+    is a span rather than a button — nothing to focus, nothing to announce.
+  */
+  .tile__play {
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: var(--shadow-accent);
+  }
+
+  .tile__play--over {
+    position: absolute;
+  }
+
+  .tile__play-icon {
+    margin-left: 0.15rem;
+  }
+
+
+  @media (min-width: 48rem) {
+    .media__grid {
+      /* The reference gives the video tile the wider share. */
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    }
+  }
+</style>
