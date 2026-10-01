@@ -395,6 +395,9 @@ Repo hygiene worth a minute, noticed while reading: `.vite/deps` (a build artifa
 - **First note published** (2026-09-30) — "What I learned running DR outside
   vendor-supported regions", 991 words, drawn from the DR case study. The Writing
   section now renders on the home page and the note is in the RSS feed.
+- **Certifications linked** (2026-10-01) — AWS Solutions Architect and Terraform
+  Associate 003 now link to their Credly credential pages, taken from the résumé's
+  embedded URLs. CKAD has no credential URL in either résumé and stays unlinked.
 - **Availability line restored** — the template rebuild had dropped
   `site.availability`; it is back in the hero as a pill above the name.
 
@@ -402,7 +405,7 @@ Repo hygiene worth a minute, noticed while reading: `.vite/deps` (a build artifa
 
 | # | Item | Where | Detail |
 |---|---|---|---|
-| 1 | **The résumé PDF publishes a phone number** | `public/aksh-sood-resume.pdf` | The site never prints it, but linking the PDF does publish it — which the brief said not to do. Options: ship a redacted PDF, drop the download, or accept it. Needs a decision. |
+| 1 | ~~The résumé PDF publishes a phone number~~ | — | **CLOSED 2026-10-01.** The owner ruled the no-phone rule scopes to the site's own pages, not the résumé. The PDF ships with the number; `CLAUDE.md` § 2 was reworded to say so. The PDF was also replaced with a version carrying the new LinkedIn URL. |
 | 2 | **FleetPulse live demo** | `projects.json` | Source link is live. The demo is withheld until the 500s are fixed — see item H. |
 | 3 | **Lead Intelligence / RAG Pipeline repos** | `projects.json` | Public GitHub URLs, or set them to stay unlinked. |
 | 4 | **FleetPulse screenshot** | `Projects.astro` | Currently a dashed placeholder box. The driver portal's login screen renders fine, so a screenshot can be taken now without fixing the API. |
@@ -410,4 +413,4 @@ Repo hygiene worth a minute, noticed while reading: `.vite/deps` (a build artifa
 | 6 | **Naming the managed broker** | `work/dr-outside-supported-regions.mdx` | Written as ActiveMQ with Amazon MQ in the stack list — inferred from "network-of-brokers" plus the skills list, not stated in either resume. Confirm before publishing. |
 | 7 | **Case study periods** | `work/*.mdx` | Shown as 2024–2025, 2024–2025 and 2026. Inferred from role dates; confirm. |
 | 8 | **Senior start date** | `experience/4-senior.md` | Both resumes say Apr 2026. Confirming because the promotion path is a headline story. |
-| 9 | **Domain** | `site.config.mjs`, `infra/terraform.tfvars` | Placeholder `akshsood.com` until registered. |
+| 9 | **Domain** | `site.config.mjs`, `infra/terraform.tfvars` | Live on GitHub Pages at `https://aksh-sood.github.io` (2026-10-01). Still no custom domain — when one is registered, change `SITE_URL` and add `public/CNAME`. |

@@ -417,6 +417,31 @@ Also verified against the built output:
 
 ## Deploying
 
+### GitHub Pages — the live deploy
+
+The site is published at **https://aksh-sood.github.io** from the repo
+`aksh-sood/aksh-sood.github.io`. That exact repo name is what makes it a *user
+site* served at the root; any other name becomes a project site at `/<repo>/`
+and would need `base` set in `astro.config.mjs`.
+
+`.github/workflows/deploy.yml` builds on every push to `main` and publishes via
+`actions/deploy-pages`. Settings → Pages → Source must be set to **GitHub
+Actions**, not a branch. To ship a change:
+
+```bash
+git add -A && git commit -m "…" && git push
+```
+
+Two things to know about this host:
+
+- **It cannot send HTTP response headers.** The policy in `vercel.json` and
+  `public/_headers` does not apply. `src/layouts/Base.astro` declares the CSP as
+  a `<meta http-equiv>` tag instead, which covers everything except
+  `frame-ancestors` — that is header-only, so clickjacking protection is
+  unavailable here and returns on Vercel or Cloudflare.
+- **`public/.nojekyll` must stay.** Astro emits `dist/_astro/`, and Jekyll
+  strips underscore-prefixed paths. Without it every stylesheet and font 404s.
+
 ### Vercel
 
 `vercel.json` is committed with cache and security headers. Import the repo, or:
